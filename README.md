@@ -25,12 +25,53 @@ Testing the C Program for the desired output.
 
 ## C Program that illustrate communication between two process using unnamed pipes using Linux API system calls
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
+int main() {
+    int status;
+
+    printf("Running ps with execl\n");
+    if (fork() == 0) {
+        execl("/bin/ps", "ps", "-f", NULL);   // full path required
+        perror("execl failed");
+        exit(1);
+    }
+    wait(&status);
+
+    if (WIFEXITED(status)) {
+        printf("Child exited with status: %d\n", WEXITSTATUS(status));
+    } 
+    else {
+        printf("Child did not exit successfully\n");
+    }
+
+    printf("Running ps with execlp (without full path)\n");
+    if (fork() == 0) {
+        execlp("ps", "ps", "-f", NULL);   // execlp searches PATH
+        perror("execlp failed");
+        exit(1);
+    }
+    wait(&status);
+
+    if (WIFEXITED(status)) {
+        printf("Child exited for execlp with status: %d\n", WEXITSTATUS(status));
+    } 
+    else {
+        printf("Child did not exit successfully\n");
+    }
+
+    printf("Done.\n");
+    return 0;
+}
 
 
 
 ## OUTPUT
-
+![image](image/output1.png)
 
 ## C Program that illustrate communication between two process using named pipes using Linux API system calls
 
